@@ -1,0 +1,4 @@
+project_id = "truthlayer"
+
+[functions.verify]
+verify_jwt = false
