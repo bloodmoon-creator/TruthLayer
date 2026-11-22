@@ -7,9 +7,10 @@ import { useAuth } from '@/context/AuthContext';
 import { translations, languageNames } from '@/i18n/translations';
 import type { LanguageCode } from '@/types';
 
-const navItems: { route: Route; labelKey: 'nav_home' | 'nav_verify' | 'nav_dashboard' | 'nav_history' | 'nav_about' | 'nav_methodology' }[] = [
+const navItems: { route: Route; labelKey: 'nav_home' | 'nav_verify' | 'nav_media' | 'nav_dashboard' | 'nav_history' | 'nav_about' | 'nav_methodology' }[] = [
   { route: { name: 'home' }, labelKey: 'nav_home' },
   { route: { name: 'verify' }, labelKey: 'nav_verify' },
+  { route: { name: 'media' }, labelKey: 'nav_media' },
   { route: { name: 'dashboard' }, labelKey: 'nav_dashboard' },
   { route: { name: 'history' }, labelKey: 'nav_history' },
   { route: { name: 'about' }, labelKey: 'nav_about' },

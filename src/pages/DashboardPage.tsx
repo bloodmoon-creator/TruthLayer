@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { FileBarChart2, CheckCircle2, XCircle, Gauge, ArrowRight, Plus } from 'lucide-react';
+import { FileBarChart2, CheckCircle2, XCircle, Gauge, ArrowRight, Plus, ScanSearch } from 'lucide-react';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useRouter, routeToPath } from '@/router/Router';
 import { useAuth } from '@/context/AuthContext';
 import { getDashboardStats, getUserReports } from '@/lib/verification';
+import { getMediaDashboardStats, getUserMediaInvestigations } from '@/lib/mediaApi';
 import { formatPercent, formatDate } from '@/lib/assessment';
-import type { VerificationReport } from '@/types';
+import type { VerificationReport, MediaInvestigation } from '@/types';
 
 export function DashboardPage() {
   const { t } = useI18n();
@@ -13,6 +14,8 @@ export function DashboardPage() {
   const { user, profile } = useAuth();
   const [stats, setStats] = useState<{ total: number; supported: number; contradicted: number; avgConfidence: number | null } | null>(null);
   const [recent, setRecent] = useState<VerificationReport[]>([]);
+  const [mediaStats, setMediaStats] = useState<{ total: number; authentic: number; aiGenerated: number; manipulated: number } | null>(null);
+  const [mediaRecent, setMediaRecent] = useState<MediaInvestigation[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,10 +23,12 @@ export function DashboardPage() {
       setLoading(false);
       return;
     }
-    Promise.all([getDashboardStats(), getUserReports()])
-      .then(([s, reports]) => {
+    Promise.all([getDashboardStats(), getUserReports(), getMediaDashboardStats(), getUserMediaInvestigations()])
+      .then(([s, reports, ms, mediaInv]) => {
         setStats(s);
         setRecent(reports.slice(0, 5));
+        setMediaStats(ms);
+        setMediaRecent(mediaInv.slice(0, 3));
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -112,6 +117,62 @@ export function DashboardPage() {
                       <span className="badge bg-error-500/10 text-error-400">{r.contradicted_count} ✗</span>
                     )}
                   </div>
+                  <ArrowRight className="w-4 h-4 text-ink-500 shrink-0" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Media Intelligence section */}
+        <div className="mt-10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-display font-semibold text-ink-100">{t('nav_media')}</h2>
+            <button onClick={() => navigate('/media')} className="btn-outline text-sm px-3 py-2">
+              <ScanSearch className="w-4 h-4" />
+              {t('media_cta')}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="glass-card p-4">
+              <ScanSearch className="w-5 h-5 text-ink-100" />
+              <div className="mt-2 text-2xl font-display font-semibold text-ink-100">{mediaStats ? String(mediaStats.total) : '—'}</div>
+              <div className="text-xs text-ink-400 mt-0.5">{t('media_dashboard_stat_total')}</div>
+            </div>
+            <div className="glass-card p-4">
+              <CheckCircle2 className="w-5 h-5 text-success-400" />
+              <div className="mt-2 text-2xl font-display font-semibold text-success-400">{mediaStats ? String(mediaStats.authentic) : '—'}</div>
+              <div className="text-xs text-ink-400 mt-0.5">{t('media_dashboard_stat_authentic')}</div>
+            </div>
+            <div className="glass-card p-4">
+              <ScanSearch className="w-5 h-5 text-accent-300" />
+              <div className="mt-2 text-2xl font-display font-semibold text-accent-300">{mediaStats ? String(mediaStats.aiGenerated) : '—'}</div>
+              <div className="text-xs text-ink-400 mt-0.5">{t('media_dashboard_stat_ai')}</div>
+            </div>
+            <div className="glass-card p-4">
+              <XCircle className="w-5 h-5 text-error-400" />
+              <div className="mt-2 text-2xl font-display font-semibold text-error-400">{mediaStats ? String(mediaStats.manipulated) : '—'}</div>
+              <div className="text-xs text-ink-400 mt-0.5">{t('media_dashboard_stat_manipulated')}</div>
+            </div>
+          </div>
+
+          {mediaRecent.length > 0 && (
+            <div className="space-y-3">
+              {mediaRecent.map((m) => (
+                <button
+                  key={m.id}
+                  onClick={() => navigate(routeToPath({ name: 'media-results', id: m.id }))}
+                  className="glass-card-hover w-full text-start p-4 flex items-center gap-4"
+                >
+                  <ScanSearch className="w-5 h-5 text-accent-400 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-ink-100 truncate">{m.media_type === 'image' ? 'Image' : 'Video'} · {m.file_name ?? t('report_title_default')}</p>
+                    <p className="text-xs text-ink-500 mt-0.5">{formatDate(m.created_at)}</p>
+                  </div>
+                  {m.final_classification && (
+                    <span className="badge bg-accent-500/10 text-accent-300 shrink-0">{t(`class_${m.final_classification}` as never)}</span>
+                  )}
                   <ArrowRight className="w-4 h-4 text-ink-500 shrink-0" />
                 </button>
               ))}

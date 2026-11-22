@@ -1,4 +1,4 @@
-import { ShieldCheck, Search, Scale, FileBarChart2, ArrowRight, CheckCircle2, XCircle, AlertTriangle, HelpCircle, Type, Link2, Upload } from 'lucide-react';
+import { ShieldCheck, Search, Scale, FileBarChart2, ArrowRight, CheckCircle2, XCircle, AlertTriangle, HelpCircle, Type, Link2, Upload, ScanSearch, Video, Fingerprint, Globe2 } from 'lucide-react';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useRouter, routeToPath } from '@/router/Router';
 import { useAuth } from '@/context/AuthContext';
@@ -28,6 +28,13 @@ export function HomePage() {
     { icon: Type, titleKey: 'inputs_text', descKey: 'inputs_text_desc' },
     { icon: Link2, titleKey: 'inputs_url', descKey: 'inputs_url_desc' },
     { icon: Upload, titleKey: 'inputs_doc', descKey: 'inputs_doc_desc' },
+  ];
+
+  const mediaPipeline = [
+    { icon: Fingerprint, titleKey: 'media_feature_forensics', descKey: 'media_feature_forensics_desc' },
+    { icon: Video, titleKey: 'media_feature_frames', descKey: 'media_feature_frames_desc' },
+    { icon: ScanSearch, titleKey: 'media_feature_classification', descKey: 'media_feature_classification_desc' },
+    { icon: Globe2, titleKey: 'media_feature_sources', descKey: 'media_feature_sources_desc' },
   ];
 
   const exampleClaims = [
@@ -144,6 +151,38 @@ export function HomePage() {
                 <p className="mt-2 text-sm text-ink-400 leading-relaxed">{t(f.descKey as never)}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Media Intelligence */}
+      <section className="section-pad">
+        <div className="container-app">
+          <div className="text-center max-w-2xl mx-auto">
+            <span className="badge bg-accent-500/10 text-accent-300 border border-accent-500/20 mb-5">
+              <ScanSearch className="w-3.5 h-3.5" />
+              {t('nav_media')}
+            </span>
+            <h2 className="text-3xl font-display font-bold text-gradient">{t('media_section_title')}</h2>
+            <p className="mt-3 text-ink-400 leading-relaxed">{t('media_section_desc')}</p>
+          </div>
+          <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {mediaPipeline.map((step, i) => (
+              <div key={i} className="glass-card-hover p-6 relative overflow-hidden">
+                <span className="absolute -top-2 -end-2 text-7xl font-display font-bold text-white/[0.04] select-none">
+                  {i + 1}
+                </span>
+                <step.icon className="w-8 h-8 text-accent-400" />
+                <h3 className="mt-4 font-semibold text-ink-100">{t(step.titleKey as never)}</h3>
+                <p className="mt-2 text-sm text-ink-400 leading-relaxed">{t(step.descKey as never)}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button onClick={() => navigate('/media')} className="btn-primary text-base px-7 py-3.5 group">
+              {t('media_cta')}
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </button>
           </div>
         </div>
       </section>

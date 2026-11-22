@@ -8,6 +8,7 @@ const columns: { titleKey: 'footer_product' | 'footer_company' | 'footer_legal';
     titleKey: 'footer_product',
     links: [
       { route: { name: 'verify' }, labelKey: 'nav_verify' },
+      { route: { name: 'media' }, labelKey: 'nav_media' },
       { route: { name: 'dashboard' }, labelKey: 'nav_dashboard' },
       { route: { name: 'history' }, labelKey: 'nav_history' },
     ],
